@@ -1,0 +1,17 @@
+repository_type: pipeline
+
+nf_core_version: 3.3.2
+
+lint: {}
+
+template:
+  org: nf-core
+  name: workflowhunfeldruhland
+  description: Workflow practical course RNA Seq
+  author: Ulrike Hunfeld, Michael Ruhland
+  version: 1.0.0dev
+  force: true
+  outdir: .
+  skip_features:
+    - gpu
+  is_nfcore: true
