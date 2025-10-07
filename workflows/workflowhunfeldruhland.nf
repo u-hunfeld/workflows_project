@@ -32,7 +32,9 @@ workflow WORKFLOWHUNFELDRUHLAND {
     FASTQC (
         ch_samplesheet
     )
-    //Run Cutadapt
+    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+
+// RUN CUTADAPT
     CUTADAPT(
         ch_samplesheet
     )
@@ -43,9 +45,18 @@ workflow WORKFLOWHUNFELDRUHLAND {
 
     ch_trimmed_reads.view() //for debugging, can be deleted again later
 
-
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
+//
+    // Prepare STAR index and reference files
     //
+    ch_star_index = params.star_index ? // ? IS A TERNARY OPERATOR (IF-THEN-ELSE)
+        Channel.fromPath(params.star_index, checkIfExists: true) : 
+        Channel.empty()
+    ch_gtf = params.gtf ? 
+        Channel.fromPath(params.gtf, checkIfExists: true) : 
+        Channel.empty()
+    
+    //
+    
     // Collate and save software versions
     //
     softwareVersionsToYAML(ch_versions)
@@ -56,10 +67,29 @@ workflow WORKFLOWHUNFELDRUHLAND {
             newLine: true
         ).set { ch_collated_versions }
 
+    STAR_ALIGN (
+            ch_trimmed_reads,
+            ch_star_index,
+            ch_gtf,
+            false,                    // star_ignore_sjdbgtf (boolean, not channel)
+            params.seq_platform ?: '',  // string value, not channel
+            params.seq_center ?: ''     // string value, not channel
+        )
+    ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first())
 
     //
     // MODULE: MultiQC
     //
+      //
+    // Collect MultiQC files
+    //
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
+    ch_multiqc_files = ch_multiqc_files.mix(CUTADAPT.out.log.collect{it[1]})
+    ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_final.collect{it[1]})
+
+
+
+
     ch_multiqc_config        = Channel.fromPath(
         "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
     ch_multiqc_custom_config = params.multiqc_config ?
@@ -97,18 +127,11 @@ workflow WORKFLOWHUNFELDRUHLAND {
         []
     )
 
-    emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
+    emit:
+    multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 
-    //input channels for staralign
-    ch_genome_index = Channel.fromPath(params.genome, checkIfExists: true)
-    //ch_index = Channel.fromPath(params.star_index)
-    ch_gtf = Channel.fromPath(params.gtf, checkIfExists: true)
-    ch_ignore_sjdbgtf = Channel.value(true)
-    ch_seq_platform = Channel.fromPath(params.seq_center)
-    ch_seq_center = Channel.fromPath(params.seq_platform)
 
-    STAR_ALIGN (ch_trimmed_reads, ch_genome_index, ch_gtf, ch_ignore_sjdbgtf, ch_seq_platform, ch_seq_center)
 }
 
 /*
