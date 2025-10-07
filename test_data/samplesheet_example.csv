@@ -1,2 +1,2 @@
 sample,fastq_1,fastq_2,strandedness,condition
-SRX19144486,./project_data/SRX19144486_SRR23195516_1_small.fastq.gz,./project_data/SRX19144486_SRR23195516_2_small.fastq.gz,reverse,test
+SRX19144486,./test_data/SRX19144486_SRR23195516_1_small.fastq.gz,./test_data/SRX19144486_SRR23195516_2_small.fastq.gz,reverse,test
