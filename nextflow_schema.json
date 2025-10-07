@@ -149,6 +149,42 @@
                 }
             }
         },
+        "alignment_options": {
+            "title": "Alignment options",
+            "type": "object",
+            "fa_icon": "fas fa-map-marked-alt",
+            "description": "Options for read alignment with STAR",
+            "properties": {
+                "star_index": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to directory containing STAR index files",
+                    "fa_icon": "fas fa-folder"
+                },
+                "gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "description": "Path to GTF annotation file",
+                    "fa_icon": "fas fa-file-alt"
+                },
+                "seq_center": {
+                    "type": "string",
+                    "description": "Sequencing center information to be added to read group header",
+                    "fa_icon": "fas fa-building"
+                },
+                "seq_platform": {
+                    "type": "string",
+                    "default": "ILLUMINA",
+                    "description": "Sequencing platform information to be added to read group header",
+                    "fa_icon": "fas fa-desktop"
+                }
+            }
+        },
+
+
         "generic_options": {
             "title": "Generic options",
             "type": "object",
