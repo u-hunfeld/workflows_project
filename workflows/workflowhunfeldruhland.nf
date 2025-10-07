@@ -41,7 +41,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
 
-    ch_trimmed_reads.view()
+    ch_trimmed_reads.view() //for debugging, can be deleted again later
 
 
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
@@ -100,7 +100,15 @@ workflow WORKFLOWHUNFELDRUHLAND {
     emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 
-    //STAR_ALIGN (ch_trimmed_reads)
+    //input channels for staralign
+    ch_genome_index = Channel.fromPath(params.genome, checkIfExists: true)
+    //ch_index = Channel.fromPath(params.star_index)
+    ch_gtf = Channel.fromPath(params.gtf, checkIfExists: true)
+    ch_ignore_sjdbgtf = Channel.value(true)
+    ch_seq_platform = Channel.fromPath(params.seq_center)
+    ch_seq_center = Channel.fromPath(params.seq_platform)
+
+    STAR_ALIGN (ch_trimmed_reads, ch_genome_index, ch_gtf, ch_ignore_sjdbgtf, ch_seq_platform, ch_seq_center)
 }
 
 /*
