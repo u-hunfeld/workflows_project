@@ -82,9 +82,12 @@ workflow WORKFLOWHUNFELDRUHLAND {
         ch_gtf = Channel.fromPath(gtf_file, checkIfExists: true)
     } else if (fasta_file && gtf_file) {
         // Generate STAR index from FASTA and GTF
+        
+        ch_fasta= Channel.fromPath(fasta_file).map{fasta -> [[:], fasta]}
+        ch_gtf_for_index=Channel.fromPath(gtf_file).map{gtf -> [[:], gtf]}
+
         STAR_GENOMEGENERATE (
-            Channel.fromPath(fasta_file, checkIfExists: true),
-            Channel.fromPath(gtf_file, checkIfExists: true)
+            ch_fasta, ch_gtf_for_index
         )
         ch_star_index = STAR_GENOMEGENERATE.out.index
         ch_gtf = Channel.fromPath(gtf_file, checkIfExists: true)
