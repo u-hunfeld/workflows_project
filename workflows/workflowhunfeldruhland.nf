@@ -6,6 +6,7 @@
 include { FASTQC                 } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { CUTADAPT               } from '../modules/nf-core/cutadapt/main'
+include { STAR_ALIGN             } from '../modules/nf-core/star/align/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -39,6 +40,8 @@ workflow WORKFLOWHUNFELDRUHLAND {
     
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
+
+    ch_trimmed_reads.view()
 
 
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
@@ -97,6 +100,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     emit:multiqc_report = MULTIQC.out.report.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
 
+    //STAR_ALIGN (ch_trimmed_reads)
 }
 
 /*
