@@ -84,13 +84,12 @@ workflow WORKFLOWHUNFELDRUHLAND {
         // Generate STAR index from FASTA and GTF
         
         ch_fasta= Channel.fromPath(fasta_file).map{fasta -> [[:], fasta]}
-        ch_gtf_for_index=Channel.fromPath(gtf_file).map{gtf -> [[:], gtf]}
+        ch_gtf=Channel.fromPath(gtf_file).map{gtf -> [[:], gtf]}
 
         STAR_GENOMEGENERATE (
-            ch_fasta, ch_gtf_for_index
+            ch_fasta, ch_gtf
         )
         ch_star_index = STAR_GENOMEGENERATE.out.index
-        ch_gtf = Channel.fromPath(gtf_file, checkIfExists: true)
         ch_versions = ch_versions.mix(STAR_GENOMEGENERATE.out.versions)
     } else {
         error "Either provide --star_index, or both --fasta and --gtf, or use --genome to auto-select reference files"
@@ -110,6 +109,8 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Align reads with STAR
     //
+    ch_star_index.view()
+
     STAR_ALIGN (
         ch_trimmed_reads,
         ch_star_index,
