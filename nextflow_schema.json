@@ -291,6 +291,12 @@
             "$ref": "#/$defs/reference_genome_options"
         },
         {
+            "$ref": "#/$defs/trimming_options"
+        },
+        {
+            "$ref": "#/$defs/alignment_options"
+        },
+        {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
