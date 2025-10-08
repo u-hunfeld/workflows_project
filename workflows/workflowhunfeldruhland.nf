@@ -139,11 +139,15 @@ workflow WORKFLOWHUNFELDRUHLAND {
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first())
     
-    STAR_ALIGN.out.bam.view()
+    ch_featurecounts_input = STAR_ALIGN.out.bam
+        .combine(ch_gtf)
+        .map { meta1, bam, meta2, gtf -> 
+            [ meta1, bam, gtf ]  // Behalte meta1, entferne meta2
+        }
 
     SUBREAD_FEATURECOUNTS(
-            STAR_ALIGN.out.bam
-    ) 
+        ch_featurecounts_input  // Jetzt ein Tupel [meta, bam, gtf]
+    )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
     //
