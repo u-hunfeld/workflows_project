@@ -3,7 +3,8 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_RAW } from '../modules/nf-core/fastqc/main'
+include { FASTQC as FASTQC_TRIMMED } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { CUTADAPT               } from '../modules/nf-core/cutadapt/main'
 include { STAR_ALIGN             } from '../modules/nf-core/star/align/main'
@@ -55,10 +56,10 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Run FastQC
     //
-    FASTQC (
+    FASTQC_RAW (
         ch_samplesheet
-    )
-    ch_versions = ch_versions.mix(FASTQC.out.versions.first())
+    ).set {fastqc_raw}
+    ch_versions = ch_versions.mix(FASTQC_RAW.out.versions.first())
 
     //
     // MODULE: Run CUTADAPT
@@ -72,10 +73,12 @@ workflow WORKFLOWHUNFELDRUHLAND {
     ch_trimmed_reads = CUTADAPT.out.reads
 
     //ch_trimmed_reads.view() //for debugging, can be deleted again later
-    FASTQC (
+    FASTQC_TRIMMED (
         ch_trimmed_reads
     ).set { fastqc_trimmed } 
-    ch_multiqc_files = ch_multiqc_files.mix(fastqc_trimmed.out.zip.collect{it[1]})
+    ch_versions = ch_versions.mix(FASTQC_TRIMMED.out.versions.first())
+
+    //ch_multiqc_files = ch_multiqc_files.mix(fastqc_trimmed.out.zip.collect{it[1]})
     //
     // Prepare STAR index and reference files
     //
@@ -130,7 +133,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // Collect MultiQC files
     //
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]})
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMMED.out.zip.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(CUTADAPT.out.log.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_final.collect{it[1]})
 
