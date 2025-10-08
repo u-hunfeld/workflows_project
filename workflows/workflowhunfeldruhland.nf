@@ -79,7 +79,8 @@ workflow WORKFLOWHUNFELDRUHLAND {
     if (star_index_dir) {
         // Use existing STAR index
         ch_star_index = Channel.fromPath(star_index_dir, checkIfExists: true)
-        ch_gtf = Channel.fromPath(gtf_file, checkIfExists: true)
+                .map { index_path -> tuple([[:], index_path]) }
+        ch_gtf=Channel.fromPath(gtf_file, checkIfExists: true).map{gtf -> [[:], gtf]}
     } else if (fasta_file && gtf_file) {
         // Generate STAR index from FASTA and GTF
         
@@ -109,6 +110,8 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Align reads with STAR
     //
+    ch_star_index.view()
+
     ch_star_index.view()
 
     STAR_ALIGN (
