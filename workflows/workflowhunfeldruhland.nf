@@ -71,8 +71,11 @@ workflow WORKFLOWHUNFELDRUHLAND {
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
 
-    ch_trimmed_reads.view() //for debugging, can be deleted again later
-
+    //ch_trimmed_reads.view() //for debugging, can be deleted again later
+    FASTQC (
+        ch_trimmed_reads
+    ).set { fastqc_trimmed } 
+    ch_multiqc_files = ch_multiqc_files.mix(fastqc_trimmed.out.zip.collect{it[1]})
     //
     // Prepare STAR index and reference files
     //
