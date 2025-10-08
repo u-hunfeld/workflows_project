@@ -9,6 +9,7 @@ include { MULTIQC                } from '../modules/nf-core/multiqc/main'
 include { CUTADAPT               } from '../modules/nf-core/cutadapt/main'
 include { STAR_ALIGN             } from '../modules/nf-core/star/align/main'
 include { STAR_GENOMEGENERATE    } from '../modules/nf-core/star/genomegenerate/main'
+include { SUBREAD_FEATURECOUNTS } from '../modules/nf-core/subread/featurecounts/main'
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -56,9 +57,6 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Run FastQC
     //
-
-    ch_samplesheet.view(index -> "samplesheet channel: ${index}")
-
     FASTQC_RAW (
         ch_samplesheet
     ).set {fastqc_raw}
@@ -74,7 +72,6 @@ workflow WORKFLOWHUNFELDRUHLAND {
     
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
-            .view { index -> "trimmed reads channel: ${index}" }
 
     //ch_trimmed_reads.view() //for debugging, can be deleted again later
     FASTQC_TRIMMED (
@@ -90,7 +87,15 @@ workflow WORKFLOWHUNFELDRUHLAND {
         // Use existing STAR index
         ch_star_index = Channel.fromPath(star_index_dir, checkIfExists: true)
                 .map { index_path -> tuple([[:], index_path]) }
-        ch_gtf=Channel.fromPath(gtf_file, checkIfExists: true).map{gtf -> [[:], gtf]}
+        
+        if (gtf_file) {
+        ch_gtf = Channel.fromPath(gtf_file, checkIfExists: true).map{gtf -> [[:], gtf]}
+    } else {
+        ch_gtf = Channel.empty()
+        log.warn "No GTF file provided. Some downstream analyses may be limited."
+    }
+
+
     } else if (fasta_file && gtf_file) {
         // Generate STAR index from FASTA and GTF
         
@@ -120,7 +125,9 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Align reads with STAR
     //
-    ch_star_index.view{index -> "star index channel: ${index}"}
+    ch_star_index.view()
+
+    ch_star_index.view()
 
     STAR_ALIGN (
         ch_trimmed_reads,
@@ -131,6 +138,13 @@ workflow WORKFLOWHUNFELDRUHLAND {
         params.seq_center ?: ''     // string value, not channel
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first())
+    
+    STAR_ALIGN.out.bam.view()
+
+    SUBREAD_FEATURECOUNTS(
+            STAR_ALIGN.out.bam
+    ) 
+    ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
     //
     // Collect MultiQC files
@@ -138,6 +152,8 @@ workflow WORKFLOWHUNFELDRUHLAND {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMMED.out.zip.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(CUTADAPT.out.log.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_final.collect{it[1]})
+    // Für MultiQC hinzufügen
+    ch_multiqc_files = ch_multiqc_files.mix(SUBREAD_FEATURECOUNTS.out.summary.collect{it[1]})
 
     //
     // MODULE: MultiQC
