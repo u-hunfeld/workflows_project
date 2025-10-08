@@ -56,6 +56,9 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Run FastQC
     //
+
+    ch_samplesheet.view(index -> "samplesheet channel: ${index}")
+
     FASTQC_RAW (
         ch_samplesheet
     ).set {fastqc_raw}
@@ -71,6 +74,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
+            .view { index -> "trimmed reads channel: ${index}" }
 
     //ch_trimmed_reads.view() //for debugging, can be deleted again later
     FASTQC_TRIMMED (
@@ -116,9 +120,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Align reads with STAR
     //
-    ch_star_index.view()
-
-    ch_star_index.view()
+    ch_star_index.view{index -> "star index channel: ${index}"}
 
     STAR_ALIGN (
         ch_trimmed_reads,
