@@ -180,6 +180,11 @@
                     "default": "ILLUMINA",
                     "description": "Sequencing platform information to be added to read group header",
                     "fa_icon": "fas fa-desktop"
+                },
+                "readGzip": {
+                    "type": "boolean",
+                    "description": "Information whether the input reads are gzip-compressed",
+                    "default": false
                 }
             }
         },
