@@ -188,7 +188,28 @@
                 }
             }
         },
-
+        "feature_counting_options": {
+            "title": "Feature counting options",
+            "type": "object",
+            "fa_icon": "fas fa-calculator",
+            "description": "Options for feature counting with featureCounts",
+            "properties": {
+                "feature_type": {
+                    "type": "string",
+                    "default": "exon",
+                    "description": "Feature type in GTF file to count reads against",
+                    "fa_icon": "fas fa-dna",
+                    "help_text": "Feature type (3rd column in GTF file) to be used. All features of other type are ignored (default: exon)"
+                },
+                "t": {
+                    "type": "string", 
+                    "default": "exon",
+                    "description": "Feature type in GTF file (same as feature_type)",
+                    "fa_icon": "fas fa-dna",
+                    "help_text": "Alternative name for feature_type parameter"
+                }
+            }
+        },
 
         "generic_options": {
             "title": "Generic options",
@@ -288,6 +309,7 @@
             }
         }
     },
+    
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
@@ -302,10 +324,14 @@
             "$ref": "#/$defs/alignment_options"
         },
         {
+            "$ref": "#/$defs/feature_counting_options"
+        },
+        {
             "$ref": "#/$defs/institutional_config_options"
         },
         {
             "$ref": "#/$defs/generic_options"
         }
+
     ]
 }
