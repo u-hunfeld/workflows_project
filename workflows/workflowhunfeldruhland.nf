@@ -127,12 +127,11 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     ch_star_index.view()
 
-    ch_star_index.view()
 
     STAR_ALIGN (
         ch_trimmed_reads,
-        ch_star_index,
-        ch_gtf,
+        ch_star_index.collect(),
+        ch_gtf.collect(),
         false,                    // star_ignore_sjdbgtf (boolean, not channel)
         params.seq_platform ?: '',  // string value, not channel
         params.seq_center ?: ''     // string value, not channel
