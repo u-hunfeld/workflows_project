@@ -44,20 +44,21 @@
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
 <!-- TODO nf-core: Describe the minimum required steps to execute the pipeline, e.g. how to prepare samplesheets.
-     Explain what rows and columns represent. For instance (please edit as appropriate):
+     Explain what rows and columns represent. For instance (please edit as appropriate):-->
 
 First, prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
 
 ```csv
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
+sample,fastq_1,fastq_2,strandedness,condition
+sampleA,path/to/fileA_1.fastq.gz,path/to/fileA_2.fastq.gz.fastq.gz,reverse,control
+sampleB,path/to/fileB_1.fastq.gz,path/to/fileB_2.fastq.gz.fastq.gz,reverse,disease
 ```
 
 Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
 
--->
+
 
 Now, you can run the pipeline using:
 
@@ -65,9 +66,12 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/workflowhunfeldruhland \
-   -profile <docker/singularity/.../institute> \
+   -profile <docker/singularity/.../standard> \
    --input samplesheet.csv \
    --outdir <OUTDIR>
+   --fasta path/to/genome.fasta
+   --gtf path/to/annotation_file.gtf
+   --readGzip (set if reads are zipped)
 ```
 
 > [!WARNING]
@@ -85,7 +89,7 @@ For more details about the output files and reports, please refer to the
 
 nf-core/workflowhunfeldruhland was originally written by Ulrike Hunfeld, Michael Ruhland.
 
-We thank the following people for their extensive assistance in the development of this pipeline:
+We thank the following people for their extensive assistance in the development of this pipeline: Our great tutors (and the coffee machine).
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
 
