@@ -25,14 +25,14 @@ workflow WORKFLOWHUNFELDRUHLAND {
 
     take:
     ch_samplesheet // channel: samplesheet read in from --input
+
+
     main:
 
     ch_versions = Channel.empty()
     ch_multiqc_files = Channel.empty()
 
-    //
     // Handle genome parameters - assign from iGenomes if genome is specified
-    //
     def fasta_file = null
     def gtf_file = null
     def star_index_dir = null
@@ -55,7 +55,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     log.info "Using STAR index: ${star_index_dir}"
 
     //
-    // MODULE: Run FastQC
+    // MODULE: Run FastQC (on raw input reads)
     //
     FASTQC_RAW (
         ch_samplesheet
@@ -73,13 +73,14 @@ workflow WORKFLOWHUNFELDRUHLAND {
     // Use trimmed reads for downstream analysis
     ch_trimmed_reads = CUTADAPT.out.reads
 
-    //ch_trimmed_reads.view() //for debugging, can be deleted again later
+    //
+    // MODULE: Run FASTQC (on trimmed reads)
+    //
     FASTQC_TRIMMED (
         ch_trimmed_reads
     ).set { fastqc_trimmed } 
     ch_versions = ch_versions.mix(FASTQC_TRIMMED.out.versions.first())
 
-    //ch_multiqc_files = ch_multiqc_files.mix(fastqc_trimmed.out.zip.collect{it[1]})
     //
     // Prepare STAR index and reference files
     //
@@ -94,7 +95,6 @@ workflow WORKFLOWHUNFELDRUHLAND {
         ch_gtf = Channel.empty()
         log.warn "No GTF file provided. Some downstream analyses may be limited."
     }
-
 
     } else if (fasta_file && gtf_file) {
         // Generate STAR index from FASTA and GTF
@@ -125,27 +125,28 @@ workflow WORKFLOWHUNFELDRUHLAND {
     //
     // MODULE: Align reads with STAR
     //
-    ch_star_index.view()
-
-
     STAR_ALIGN (
         ch_trimmed_reads,
-        ch_star_index.collect(),
+        ch_star_index.collect(),        //use collect() to allow for multiple samples
         ch_gtf.collect(),
-        false,                    // star_ignore_sjdbgtf (boolean, not channel)
-        params.seq_platform ?: '',  // string value, not channel
-        params.seq_center ?: ''     // string value, not channel
+        false,
+        params.seq_platform ?: '',  
+        params.seq_center ?: '' 
     )
     ch_versions = ch_versions.mix(STAR_ALIGN.out.versions.first())
     
+    // prepare input channel for featurecounts 
     ch_featurecounts_input = STAR_ALIGN.out.bam
         .combine(ch_gtf)
         .map { meta1, bam, meta2, gtf -> 
-            [ meta1, bam, gtf ]  // Behalte meta1, entferne meta2
+            [ meta1, bam, gtf ]  
         }
 
+    //
+    // MODULE: Run SUBREAD_FEATURECOUNTS
+    //
     SUBREAD_FEATURECOUNTS(
-        ch_featurecounts_input  // Jetzt ein Tupel [meta, bam, gtf]
+        ch_featurecounts_input
     )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
@@ -155,7 +156,7 @@ workflow WORKFLOWHUNFELDRUHLAND {
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMMED.out.zip.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(CUTADAPT.out.log.collect{it[1]})
     ch_multiqc_files = ch_multiqc_files.mix(STAR_ALIGN.out.log_final.collect{it[1]})
-    // Für MultiQC hinzufügen
+    // add to MultiQC
     ch_multiqc_files = ch_multiqc_files.mix(SUBREAD_FEATURECOUNTS.out.summary.collect{it[1]})
 
     //
