@@ -20,7 +20,7 @@
 
 ## Introduction
 
-**nf-core/workflowhunfeldruhland** is a bioinformatics pipeline that ...
+**nf-core/workflowhunfeldruhland** is a bioinformatics pipeline for the analysis of RNA-seq data. The pipeline processes raw RNA sequencing reads, performs quality control and aligns the trimmed reads against a reference genome. It takes a samplesheet containing information on the samples, including the sample name, paths to the read files, strandedness and condition information, as input. The output includes count matrices and MultiQC analysis. 
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
@@ -30,7 +30,13 @@
 
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+2. Adapter trimming ([`cutadapt`](https://nf-co.re/modules/cutadapt/))
+3. Trimmed read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+4. Genome indexing ([`STAR (genomegenerate)`](https://nf-co.re/modules/star_genomegenerate/) and [`STAR (align)`](https://nf-co.re/modules/star_align/))
+5. Quantification of features ([`subread_featurecount`](https://nf-co.re/modules/subread_featurecounts/))
+6. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
