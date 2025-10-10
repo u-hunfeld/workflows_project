@@ -85,6 +85,18 @@ To see the results of an example test run with a full size dataset refer to the 
 For more details about the output files and reports, please refer to the
 [output documentation](https://nf-co.re/workflowhunfeldruhland/output).
 
+## Versions
+| Software  | Version  |
+|---|---|
+|  cutadapt  |  5.0  |
+|  fastqc    | 0.12.1 |
+|  star      | 2.7.11b   |
+| subreads_featurecounts |   |
+|  multiQC   | 1.29  |
+|---|---|
+|  Nextflow  | 25.04.7  |
+| nf-core/workflowhunfeldruhland | v1.0.1 |
+
 ## Credits
 
 nf-core/workflowhunfeldruhland was originally written by Ulrike Hunfeld, Michael Ruhland.
