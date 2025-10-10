@@ -150,6 +150,15 @@ workflow WORKFLOWHUNFELDRUHLAND {
     )
     ch_versions = ch_versions.mix(SUBREAD_FEATURECOUNTS.out.versions.first())
 
+    SUBREAD_FEATURECOUNTS.out.counts
+        .map { it[1] }
+        .collect()
+        .subscribe { count_files ->
+            def cmd = "python ${projectDir}/bin/merge_count_matrix.py ${params.outdir} ${count_files.join(' ')}"
+            cmd.execute().waitFor()
+        }
+
+
     //
     // Collect MultiQC files
     //
