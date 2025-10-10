@@ -113,7 +113,7 @@ The output includes:
 |  cutadapt  |  5.0  |
 |  fastqc    | 0.12.1 |
 |  star      | 2.7.11b   |
-| subreads_featurecounts |   |
+| subreads_featurecounts | 2.0.6  |
 |  multiQC   | 1.29  |
 |  Nextflow  | 25.04.7  |
 | nf-core/workflowhunfeldruhland | v1.0.1 |
