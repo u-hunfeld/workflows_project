@@ -71,19 +71,41 @@ nextflow run nf-core/workflowhunfeldruhland \
    --outdir <OUTDIR> \
    --fasta genome.fasta \
    --gtf annotation_file.gtf \
-   --readGzip (set if reads are zipped)
 ```
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
 
-For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/workflowhunfeldruhland/usage) and the [parameter documentation](https://nf-co.re/workflowhunfeldruhland/parameters).
+<!-- For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/workflowhunfeldruhland/usage) and the [parameter documentation](https://nf-co.re/workflowhunfeldruhland/parameters).
+-->
+## Parameters
+
+- Specify the `-profile` parameter to run the workflow using `Docker`/`Singularity`/etc. There is a `Standard` profile to run the workflow locally. The `test` profile uses Docker (it requires 12 GB memory min. and could therefore not be fully tested). 
+- Provide a samplesheet as shown above with the `--input` parameter. 
+- Specify a path to the output directory with the `--outdir` parameter. 
+- Provide the path to the genome.fasta file with the `--fasta` parameter (this parameter does not have to be specified when providing `--genome`!).
+- Provide the path to the annotation_file.gtf file with the `--gtf` parameter (this parameter does not have to be specified when providing `--genome`!).
+- When specifying a genome ID (f.e. GRCm38) with the `--genome` parameter, the two options above do not have to specified. The `--genome` parameter was not tested fully, because we ran into memory issues. 
+- Set `--readGzip` when the input read files are gzip-compressed. 
+- Set `-resume` to use cached processes when running the pipeline multiple times.
+
 
 ## Pipeline output
 
-To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/workflowhunfeldruhland/results) tab on the nf-core website pipeline page.
+<!--To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/workflowhunfeldruhland/results) tab on the nf-core website pipeline page.
 For more details about the output files and reports, please refer to the
-[output documentation](https://nf-co.re/workflowhunfeldruhland/output).
+[output documentation](https://nf-co.re/workflowhunfeldruhland/output).-->
+
+The pipeline output can be found in the with `--outdir` specified output directory. 
+
+The output includes:
+- A count matrix with gene counts of all input samples
+- A MultiQC report 
+- Output of several pipeline steps:
+  - FastQC reports 
+  - STAR Alignment logs and information 
+  - pipeline information, f.e. a .yml file including used software versions
+
 
 ## Versions
 | Software  | Version  |
@@ -93,7 +115,6 @@ For more details about the output files and reports, please refer to the
 |  star      | 2.7.11b   |
 | subreads_featurecounts |   |
 |  multiQC   | 1.29  |
-|---|---|
 |  Nextflow  | 25.04.7  |
 | nf-core/workflowhunfeldruhland | v1.0.1 |
 
