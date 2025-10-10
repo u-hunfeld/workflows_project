@@ -29,9 +29,9 @@
             },
             "strandedness":{
                 "type": "string",
-                "enum": ["forward", "reverse"],
+                "enum": ["forward", "reverse", "auto"],
                 "default": "forward",
-                "errorMessage": "Strandedness must be one of 'forward' or 'reverse'",
+                "errorMessage": "Strandedness must be one of 'auto', 'forward' or 'reverse'",
                 "meta": ["strand"]
             },
             "condition": {
@@ -40,6 +40,6 @@
                 "meta": ["group"]
             }
         },
-        "required": ["sample", "fastq_1", "strandedness", "condition"]
+        "required": ["sample", "fastq_1", "strandedness"]
     }
 }
