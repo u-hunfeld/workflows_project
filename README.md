@@ -56,7 +56,7 @@ sampleA,path/to/fileA_1.fastq.gz,path/to/fileA_2.fastq.gz.fastq.gz,reverse,contr
 sampleB,path/to/fileB_1.fastq.gz,path/to/fileB_2.fastq.gz.fastq.gz,reverse,disease
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+Each row represents a fastq file (single-end) or a pair of fastq files (paired end). Strandedness options are auto, forward and reverse. Optionally, a condition can be stated. 
 
 
 
@@ -68,9 +68,9 @@ Now, you can run the pipeline using:
 nextflow run nf-core/workflowhunfeldruhland \
    -profile <docker/singularity/.../standard> \
    --input samplesheet.csv \
-   --outdir <OUTDIR>
-   --fasta path/to/genome.fasta
-   --gtf path/to/annotation_file.gtf
+   --outdir <OUTDIR> \
+   --fasta genome.fasta \
+   --gtf annotation_file.gtf \
    --readGzip (set if reads are zipped)
 ```
 
