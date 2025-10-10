@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 # filepath: /home/mitch/Dokumente/Worklflow/Pipeline_Project/workflows_SS25_project/nf-core-workflowhunfeldruhland/bin/merge_count_matrix.py
-import pandas as pd
 import sys
+import subprocess
 import os
+try:
+    import pandas as pd
+except ImportError:
+    print("pandas not found, installing...", file=sys.stderr)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pandas"])
+    import pandas as pd
+
+
 
 outdir = sys.argv[1]
 tsv_files = sys.argv[2:]
